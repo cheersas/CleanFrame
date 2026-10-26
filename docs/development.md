@@ -24,24 +24,17 @@ Keep material rendering in the development tools. See [asset generation](assets.
 
 ## Local TV tools and signing
 
-This Mac's setup lives under `.local/` and is excluded from Git:
+This fork uses an installed Tizen Studio (default `~/tizen-studio`, override with `TIZEN_STUDIO`) with the Samsung TV extensions and Samsung Certificate Extension. Certificates are created in Certificate Manager under a Samsung TV profile (default name `cleanframe`, override with `TIZEN_PROFILE`), which stores the signing passwords. `.local/device.json` holds the TV host address and is excluded from Git.
 
-- `tizen-sdk/`: official Tizen SDK command-line tools, embedded Java and SDB.
-- `certificates/private/`: Samsung-issued author/distributor certificates, private keys, protected PKCS12 files and their generated password.
-- `certificates/ca/`: CA certificates from Samsung's Certificate Extension.
-- `device.json`: TV host address.
+`npm run package` builds the widget from `app/` and signs it with that profile through the official SDK. It writes `dist/CleanFrame-unsigned.wgt` and `dist/CleanFrame.wgt`. `scripts/font_assets.py` adds only the six approved local Pangram files when complete pairs are available, plus their generated CSS/catalogue. It never copies private fonts into `app/`. Public checkouts use Manrope, Geist and Newsreader.
 
-`npm run package` builds the widget from `app/`, configures the workspace-local SDK and signing profile, then signs it with the official SDK. It writes `dist/CleanFrame-unsigned.wgt` and `dist/CleanFrame.wgt`. `scripts/font_assets.py` adds only the six approved local Pangram files when complete pairs are available, plus their generated CSS/catalogue. It never copies private fonts into `app/`. Public checkouts use Manrope, Geist and Newsreader.
-
-`npm run export:public` is a separate offline, unsigned export. It always disables the proprietary overlay, includes the project/third-party notices and writes `dist/CleanFrame-public-unsigned.wgt`. It reads no signing credentials and contacts no TV. Use it for public build preparation; `npm run package` on this machine remains a personal build that can contain paid fonts. Asset release checks are listed in `docs/public-release.md`.
-
-The SDK requires a terminal when it prompts for certificate passwords and whether to save them. The packaging script supplies the generated certificate password from the ignored private file and declines the optional password-saving prompts. It redacts that password from output. Login credentials are not required for routine packaging.
+`npm run export:public` is a separate offline, unsigned export. It always disables the proprietary overlay, includes the project/third-party notices and writes `dist/CleanFrame-public-unsigned.wgt`. It reads no signing credentials and contacts no TV. Asset release checks are listed in `docs/public-release.md`.
 
 The initial custom XML-signature implementation was rejected by the TV. Use the official SDK packager for future builds; the installed test was signed with Tizen CLI 2.5.25.
 
 ## Another checkout or Mac
 
-Install the official [Samsung TV SDK](https://developer.samsung.com/smarttv/develop/getting-started/setting-up-sdk/installing-tv-sdk.html) into `.local/tizen-sdk`, or copy this Mac's local tools when appropriate. To retain in-place app updates, securely transfer the existing author certificate and its password. Keep those credentials local.
+Install the official [Samsung TV SDK](https://developer.samsung.com/smarttv/develop/getting-started/setting-up-sdk/installing-tv-sdk.html) (Tizen Studio) and set `TIZEN_STUDIO` if it is not in `~/tizen-studio`. To retain in-place app updates, securely transfer the existing author certificate and its password, and recreate the same Certificate Manager profile. Keep those credentials local.
 
 For new certificates, use Samsung's [certificate setup](https://developer.samsung.com/smarttv/develop/getting-started/setting-up-sdk/creating-certificates.html). The distributor certificate must include the target TV's DUID. A generic emulator certificate does not establish compatibility with this consumer TV.
 

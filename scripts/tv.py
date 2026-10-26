@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import ipaddress
 import json
+import os
 from pathlib import Path
 import subprocess
 import time
@@ -19,9 +20,9 @@ host = args.host or config.get('host')
 if not host:
     raise SystemExit('Add the TV address to .local/device.json or pass --host.')
 ipaddress.ip_address(host)
-sdb = ROOT / '.local/tizen-sdk/tools/sdb'
+sdb = Path(os.environ.get('TIZEN_STUDIO', Path.home() / 'tizen-studio')) / 'tools/sdb'
 if not sdb.exists():
-    raise SystemExit('Local SDB tool missing. See docs/development.md.')
+    raise SystemExit('SDB missing at ' + str(sdb) + '. Set TIZEN_STUDIO or see docs/development.md.')
 manifest = XML.parse(ROOT / 'app/config.xml').getroot()
 app_id = manifest.find('{http://tizen.org/ns/widgets}application').get('id')
 
