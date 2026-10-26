@@ -17,6 +17,10 @@ for tag in ['content', 'icon']:
     node = manifest.find('w:' + tag, ns)
     assert node is not None and (app / node.get('src', '')).is_file(), 'Missing ' + tag + ' file'
 assert all((app / name).is_file() for name in ['main.js', 'style.css'])
+# 2021 TVs run Tizen 6.0 with Chromium 76: no flex gap (84+) or inset (87+); use margins and longhands.
+assert float(identity.get('required_version')) <= 6.0, 'required_version above 6.0 blocks Tizen 6.0 installs'
+for css in [app / 'style.css', *(app / 'assets').glob('*.css')]:
+    assert not re.search(r'(?<![-\w])(gap|row-gap|column-gap|inset):', css.read_text()), 'Chromium 76 lacks flex gap/inset: ' + css.name
 for reference in ['assets/wallpapers/catalog.js', 'assets/adaptive-ink.js', 'assets/font-catalog.js']:
     assert (app / reference).is_file(), 'Missing runtime catalogue: ' + reference
 for filename in ['index.html']:
@@ -41,6 +45,6 @@ for wall in walls:
     for suffix in ['study-soft', 'field-blur', 'field-frost', 'field-clear']:
         assert (app / ('assets/materials/' + wall_id + '-' + suffix + '.jpg')).is_file(), 'Missing registered material: ' + wall_id + '/' + suffix
     assert (app / ('assets/wallpapers/' + wall_id + '-panel.jpg')).is_file(), 'Missing panel backdrop: ' + wall_id
-for icon in ['stremio', 'netflix', 'disneyplus', 'youtube', 'appletv', 'primevideo', 'abciview', 'sbs', 'applemusic', 'art', 'apps', 'settings']:
+for icon in ['stremio', 'netflix', 'disneyplus', 'youtube', 'appletv', 'primevideo', 'abciview', 'sbs', 'applemusic', 'apps', 'settings']:
     assert (app / ('assets/icons/' + icon + '.svg')).is_file(), 'Missing icon: ' + icon
 print('Widget identity, version and bundled resources are valid.')
